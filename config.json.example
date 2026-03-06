@@ -1,5 +1,6 @@
 {
   "githubToken": "",
   "logRequestBody": false,
-  "logResponseBody": false
+  "logResponseBody": false,
+  "port": 23337
 }

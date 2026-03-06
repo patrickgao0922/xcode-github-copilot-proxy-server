@@ -11,7 +11,8 @@ dotenv.config();
 let config = { 
     githubToken: '',
     logRequestBody: false,
-    logResponseBody: false
+    logResponseBody: false,
+    port: 23337
 };
 try {
     const configPath = path.resolve(process.cwd(), 'config.json');
@@ -26,7 +27,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || config.port || 23337;
 const LOG_FILE_PATH = path.resolve(process.cwd(), 'proxy.log');
 
 function logToFileAndConsole(title: string, content: any) {
