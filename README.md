@@ -6,7 +6,7 @@ A local HTTP proxy that connects **Xcode Intelligence** (Xcode 16+, Xcode 26) to
 
 - **Xcode 16** — chat completions (`/v1/chat/completions`) and FIM code completions (`/v1/completions`)
 - **Xcode 26 agentic mode** — Anthropic-format messages (`/v1/messages`) and OpenAI Responses API (`/v1/responses`)
-- **Automatic Copilot token management** — fetches and refreshes the short-lived Copilot bearer token
+- **Automatic Copilot token management** — fetches and refreshes the short-lived Copilot bearer token (~30 min TTL, auto-renewed 5 min before expiry)
 - **Traffic logging** — independently log all four traffic directions (Xcode requests, Xcode responses, Copilot requests, Copilot responses) with full headers to a local JSONL file
 - **macOS launchd service** — run as a background service that starts at login
 - Binds to `127.0.0.1` only — no external exposure
@@ -100,6 +100,20 @@ npm run dev
 # Production
 npm run build
 npm start
+```
+
+### Console output
+
+The proxy logs every request/response to stdout regardless of traffic config:
+
+```
+→ POST /v1/chat/completions [model: gpt-4o]
+← POST /v1/chat/completions 200 [in: 1234 tokens | out: 56 tokens | total: 1290 tokens]
+
+→ POST /v1/messages [model: claude-opus-4-5]
+← POST /v1/messages 200
+
+[tokenManager] Copilot token acquired, expires at 2026-03-08T10:30:00.000Z, api=https://api.business.githubcopilot.com
 ```
 
 ## Configuring Xcode
