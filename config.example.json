@@ -1,0 +1,17 @@
+{
+  "githubToken": "ghu_obtained_via_npm_run_auth",
+  "port": 23800,
+  "logLevel": "info",
+  "copilot": {
+    "editorVersion": "vscode/1.96.0",
+    "pluginVersion": "copilot-chat/0.24.0",
+    "tokenRefreshBufferSecs": 300
+  },
+  "traffic": {
+    "logFile": "logs/traffic.log",
+    "logXcodeRequest": false,
+    "logXcodeResponse": false,
+    "logCopilotRequest": false,
+    "logCopilotResponse": false
+  }
+}

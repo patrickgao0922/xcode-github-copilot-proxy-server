@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.github.copilot.proxy</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <!-- Replace /usr/local/bin/node with the output of: which node -->
+    <string>/usr/local/bin/node</string>
+    <!-- Replace with the absolute path to this project's dist/index.js -->
+    <string>/Users/YOUR_USER/Projects/xcode-github-copilot-proxy-server/dist/index.js</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <!-- Absolute path to your config.json; avoids embedding the token here -->
+    <key>CONFIG_PATH</key>
+    <string>/Users/YOUR_USER/Projects/xcode-github-copilot-proxy-server/config.json</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/copilot-proxy.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/copilot-proxy-error.log</string>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/YOUR_USER/Projects/xcode-github-copilot-proxy-server</string>
+</dict>
+</plist>
