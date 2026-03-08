@@ -56,6 +56,7 @@ export async function pipeSSEResponse(
 
   const decoder = new TextDecoder();
   let xcodeChunkIndex = 0;
+  let usage: { prompt_tokens?: number; completion_tokens?: number } | null = null;
 
   try {
     for await (const chunk of upstreamStream as AsyncIterable<Uint8Array>) {
@@ -66,6 +67,10 @@ export async function pipeSSEResponse(
       if (isAzureFilterChunk(text)) {
         continue;
       }
+
+      // Extract token usage from any chunk that contains it
+      const chunkUsage = extractUsage(text);
+      if (chunkUsage !== null) usage = chunkUsage;
 
       raw.write(chunk);
 
@@ -97,12 +102,49 @@ export async function pipeSSEResponse(
         chunkIndex: xcodeChunkIndex,
       });
     }
+
+    // Always log token usage to console when available
+    if (usage !== null) {
+      const inTok = usage.prompt_tokens ?? 0;
+      const outTok = usage.completion_tokens ?? 0;
+      console.info(
+        `← ${opts.method} ${opts.xcodeUrl} 200 [in: ${inTok} tokens | out: ${outTok} tokens | total: ${inTok + outTok} tokens]`
+      );
+    } else {
+      console.info(`← ${opts.method} ${opts.xcodeUrl} 200`);
+    }
   } catch {
     // Write SSE done sentinel on error so client doesn't hang
     raw.write("data: [DONE]\n\n");
   } finally {
     raw.end();
   }
+}
+
+/**
+ * Extracts token usage from an SSE chunk text, if present.
+ */
+function extractUsage(
+  text: string
+): { prompt_tokens?: number; completion_tokens?: number } | null {
+  for (const line of text.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith("data:")) continue;
+    const json = trimmed.slice(5).trim();
+    if (json === "[DONE]") continue;
+    try {
+      const parsed = JSON.parse(json) as Record<string, unknown>;
+      if (
+        typeof parsed["usage"] === "object" &&
+        parsed["usage"] !== null
+      ) {
+        return parsed["usage"] as { prompt_tokens?: number; completion_tokens?: number };
+      }
+    } catch {
+      // Not valid JSON — skip
+    }
+  }
+  return null;
 }
 
 /**

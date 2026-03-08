@@ -17,6 +17,17 @@ export async function buildServer(config: Config): Promise<FastifyInstance> {
     req.log.debug({ method: req.method, url: req.url }, "incoming request");
   });
 
+  // Always log requests to console with model info regardless of traffic config
+  server.addHook("preHandler", async (req) => {
+    const body = req.body as Record<string, unknown> | null | undefined;
+    const model = typeof body?.["model"] === "string" ? ` [model: ${body["model"]}]` : "";
+    console.info(`→ ${req.method} ${req.url}${model}`);
+  });
+
+  server.addHook("onResponse", async (req, reply) => {
+    console.info(`← ${req.method} ${req.url} ${reply.statusCode}`);
+  });
+
   // Global error handler — return OpenAI-compatible error envelope
   server.setErrorHandler(async (error: { statusCode?: number; message?: string }, _req, reply) => {
     const statusCode = error.statusCode ?? 500;
